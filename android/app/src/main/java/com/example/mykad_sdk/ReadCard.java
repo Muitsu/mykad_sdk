@@ -61,29 +61,29 @@ public class ReadCard extends AsyncTaskExecutorService<String, String, String> {
                 byte[] photoArray = (byte[]) mReaderManager.readMyKADPhoto(MyID.PLAIN_FORMAT);
                 photo = Base64.encodeToString(photoArray, Base64.NO_WRAP);
 
-                usingFP = fpScanner != null;
-                if (usingFP) {
-                    int handcode = 0;
-                    int fingerprintTimeout = MyID.DEFAULT_FINGER_VERIFY_TIMEOUT;
-                    if (!mReaderManager.isFingerprintAvailable()) {
-                        return "Scanner cannot be found";
-                    }
-                    try {
-                        Boolean result;
-                        MyIDFPHandcode myIDFPHandcode = MyIDFPHandcode.AUTO;
-                        fpResult = mReaderManager.verifyFingerprint(myIDFPHandcode, fingerprintTimeout);
-                        if (isCancelled())
-                            return "";
-                        if (fpResult == null)
-                            return "Failed to verify FP";
-                    } catch (Exception e) {
-                        Log.e(TAG, "Failed to verify FP");
-                        err = Log.getStackTraceString(e);
-                        return "Error Read Smart Card";
-                    }
-
-//                    getHandler().post(() -> );
-                }
+//                usingFP = fpScanner != null;
+//                if (usingFP) {
+//                    int handcode = 0;
+//                    int fingerprintTimeout = MyID.DEFAULT_FINGER_VERIFY_TIMEOUT;
+//                    if (!mReaderManager.isFingerprintAvailable()) {
+//                        return "Scanner cannot be found";
+//                    }
+//                    try {
+//                        Boolean result;
+//                        MyIDFPHandcode myIDFPHandcode = MyIDFPHandcode.AUTO;
+//                        fpResult = mReaderManager.verifyFingerprint(myIDFPHandcode, fingerprintTimeout);
+//                        if (isCancelled())
+//                            return "";
+//                        if (fpResult == null)
+//                            return "Failed to verify FP";
+//                    } catch (Exception e) {
+//                        Log.e(TAG, "Failed to verify FP");
+//                        err = Log.getStackTraceString(e);
+//                        return "Error Read Smart Card";
+//                    }
+//
+////                    getHandler().post(() -> );
+//                }
                 if (isCancelled()) {
                     return "";
                 }

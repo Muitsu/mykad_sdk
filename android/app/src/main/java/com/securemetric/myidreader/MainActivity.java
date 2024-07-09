@@ -1,4 +1,4 @@
-package com.example.mykad_sdk;
+package com.securemetric.myidreader;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
@@ -19,6 +19,11 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.mykad_sdk.AsyncTaskExecutorService;
+import com.example.mykad_sdk.FingerPrintManager;
+import com.example.mykad_sdk.ReadCard;
+import com.example.mykad_sdk.SDKResponse;
+import com.example.mykad_sdk.TaskCanceler;
 import com.example.mykad_sdk.fpswitch.DeviceFilterImpl;
 import com.example.mykad_sdk.fpswitch.DeviceInfo;
 import com.example.mykad_sdk.fpswitch.ReadFingerprint;
@@ -82,19 +87,19 @@ public class MainActivity extends FlutterActivity implements MyIDListener, MyIDP
                             result.success(data);
                             break;
                         }
-//                        case "readFingerprint": {
-//                            try {
-//                                mTask = new ReadFingerprint(mReaderManager, getApplicationContext());
-//                                mTask.execute(pluggedReader);
-//                                if (mTaskCanceler != null && mHandlerTask != null)
-//                                    mHandlerTask.removeCallbacks(mTaskCanceler);
-//                                mTaskCanceler = new TaskCanceler(mTask, 0xFF);
-//                                mHandlerTask.postDelayed(mTaskCanceler, 200 * 1000L);
-//                            } catch (Exception e) {
-//                                Toast.makeText(getApplicationContext(), "Read fingerprint error", Toast.LENGTH_SHORT).show();
-//                            }
-//                            break;
-//                        }
+                        case "readFingerprint": {
+                            try {
+                                mTask = new ReadFingerprint(mReaderManager, getApplicationContext());
+                                mTask.execute(pluggedReader);
+                                if (mTaskCanceler != null && mHandlerTask != null)
+                                    mHandlerTask.removeCallbacks(mTaskCanceler);
+                                mTaskCanceler = new TaskCanceler(mTask, 0xFF);
+                                mHandlerTask.postDelayed(mTaskCanceler, 200 * 1000L);
+                            } catch (Exception e) {
+                                Toast.makeText(getApplicationContext(), "Read fingerprint error", Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                        }
                         case "dispose":
                             onDispose();
                             result.success(null);

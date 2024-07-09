@@ -114,14 +114,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
-  Future<void> _printHello() async {
-    try {
-      await platform.invokeMethod('printHello');
-    } on PlatformException catch (e) {
-      debugPrint("Failed to print hello: '${e.message}'.");
-    }
-  }
-
   Future<void> _callSDK({bool usingFP = false}) async {
     try {
       var args = {"usingFP": usingFP};
@@ -222,11 +214,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 '$_counter',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-              ElevatedButton(
-                  onPressed: () {
-                    _printHello();
-                  },
-                  child: const Text("Call method channel")),
               ElevatedButton(
                   onPressed: () {
                     _callSDK(usingFP: true);
