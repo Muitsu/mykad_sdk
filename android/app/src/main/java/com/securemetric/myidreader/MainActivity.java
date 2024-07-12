@@ -88,16 +88,20 @@ public class MainActivity extends FlutterActivity implements MyIDListener, MyIDP
                             break;
                         }
                         case "readFingerprint": {
-                            try {
-                                mTask = new ReadFingerprint(mReaderManager, getApplicationContext());
-                                mTask.execute(pluggedReader);
-                                if (mTaskCanceler != null && mHandlerTask != null)
-                                    mHandlerTask.removeCallbacks(mTaskCanceler);
-                                mTaskCanceler = new TaskCanceler(mTask, 0xFF);
-                                mHandlerTask.postDelayed(mTaskCanceler, 200 * 1000L);
-                            } catch (Exception e) {
-                                Toast.makeText(getApplicationContext(), "Read fingerprint error", Toast.LENGTH_SHORT).show();
-                            }
+                            SDKResponse res = new SDKResponse("VERIFY_FP", "Verifying Fingerprint", "");
+                            methodChannel.invokeMethod("VERIFY_FP", res.toJson().toString());
+                            runOnUiThread(() -> {
+                                try {
+                                    mTask = new ReadFingerprint(mReaderManager, getApplicationContext(), methodChannel);
+                                    mTask.execute(pluggedReader);
+                                    if (mTaskCanceler != null && mHandlerTask != null)
+                                        mHandlerTask.removeCallbacks(mTaskCanceler);
+                                    mTaskCanceler = new TaskCanceler(mTask, 0xFF);
+                                    mHandlerTask.postDelayed(mTaskCanceler, 200 * 1000L);
+                                } catch (Exception e) {
+                                    Toast.makeText(getApplicationContext(), "Read fingerprint error", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             break;
                         }
                         case "dispose":
@@ -230,6 +234,7 @@ public class MainActivity extends FlutterActivity implements MyIDListener, MyIDP
     protected void onDispose() {
         mReaderManager.setOnUsbPermissionListener(null);
         mReaderManager.setOnReaderStatusChanged(null);
+        mReaderManager.disconnectReader();
         mReaderManager.destroy();
         mReaderManager = null;
     }

@@ -11,6 +11,11 @@ class SdkResponseModel {
       data: json["data"],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {"status": status, "message": message, "data": data};
+  }
+
   bool isDataMykad() {
     return message!.toLowerCase().contains("mykad");
   }

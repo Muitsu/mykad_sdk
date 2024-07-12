@@ -5,18 +5,23 @@ import android.widget.Toast;
 
 import com.example.mykad_sdk.AsyncTaskExecutorService;
 import com.example.mykad_sdk.FingerPrintManager;
+import com.example.mykad_sdk.SDKResponse;
 import com.securemetric.reader.myid.MyID;
 import com.securemetric.reader.myid.MyIDFP;
 import com.securemetric.reader.myid.MyIDFPHandcode;
 import com.securemetric.reader.myid.readers.FPScanner;
 
+import io.flutter.plugin.common.MethodChannel;
+
 public class ReadFingerprint extends AsyncTaskExecutorService<String, String, String> {
     private final MyID mReaderManager;
     private final Context context;
+    private final MethodChannel methodChannel;
 
-    public ReadFingerprint(MyID mReaderManager, Context context) {
+    public ReadFingerprint(MyID mReaderManager, Context context, MethodChannel methodChannel) {
         this.mReaderManager = mReaderManager;
         this.context = context;
+        this.methodChannel = methodChannel;
     }
 
     @Override
@@ -57,10 +62,16 @@ public class ReadFingerprint extends AsyncTaskExecutorService<String, String, St
         try {
             if (result.equalsIgnoreCase("Failed to verify fingerprint!")) {
                 Toast.makeText(context, "Failed to verify fingerprint!", Toast.LENGTH_SHORT).show();
+                SDKResponse sdkResponse = new SDKResponse("FP_FAILED_VERIFY", "Failed to verify fingerprint!", "");
+                methodChannel.invokeMethod("FP_FAILED_VERIFY", sdkResponse.toJson().toString());
             } else if (result.equalsIgnoreCase("Scanner not found")) {
                 Toast.makeText(context, "Scanner not found", Toast.LENGTH_SHORT).show();
+                SDKResponse sdkResponse = new SDKResponse("FP_SCANNER_ERROR", "Scanner not found", "");
+                methodChannel.invokeMethod("FP_SCANNER_ERROR", sdkResponse.toJson().toString());
             } else if (result.equalsIgnoreCase("Success Fingerprint")) {
                 Toast.makeText(context, "Success Fingerprint", Toast.LENGTH_SHORT).show();
+                SDKResponse sdkResponse = new SDKResponse("FP_SUCCESS_VERIFY", "Success Fingerprint", "");
+                methodChannel.invokeMethod("FP_SUCCESS_VERIFY", sdkResponse.toJson().toString());
             }
         } catch (Exception e) {
 
