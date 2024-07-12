@@ -61,29 +61,6 @@ public class ReadCard extends AsyncTaskExecutorService<String, String, String> {
                 byte[] photoArray = (byte[]) mReaderManager.readMyKADPhoto(MyID.PLAIN_FORMAT);
                 photo = Base64.encodeToString(photoArray, Base64.NO_WRAP);
 
-//                usingFP = fpScanner != null;
-//                if (usingFP) {
-//                    int handcode = 0;
-//                    int fingerprintTimeout = MyID.DEFAULT_FINGER_VERIFY_TIMEOUT;
-//                    if (!mReaderManager.isFingerprintAvailable()) {
-//                        return "Scanner cannot be found";
-//                    }
-//                    try {
-//                        Boolean result;
-//                        MyIDFPHandcode myIDFPHandcode = MyIDFPHandcode.AUTO;
-//                        fpResult = mReaderManager.verifyFingerprint(myIDFPHandcode, fingerprintTimeout);
-//                        if (isCancelled())
-//                            return "";
-//                        if (fpResult == null)
-//                            return "Failed to verify FP";
-//                    } catch (Exception e) {
-//                        Log.e(TAG, "Failed to verify FP");
-//                        err = Log.getStackTraceString(e);
-//                        return "Error Read Smart Card";
-//                    }
-//
-////                    getHandler().post(() -> );
-//                }
                 if (isCancelled()) {
                     return "";
                 }
@@ -109,29 +86,25 @@ public class ReadCard extends AsyncTaskExecutorService<String, String, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        String methodErr = ReaderStatus.CARD_INSERTED_ERROR.name();
         try {
             if (result.equalsIgnoreCase("Error Read Smart Card") || result.isEmpty()) {
                 boolean isCancel = result.isEmpty();
                 String msg = isCancel ? " cancel" : " others";
-                SDKResponse sdkResponse = new SDKResponse("CARD_INSERTED_ERROR", "Error card" + msg, err);
-                methodChannel.invokeMethod("CARD_INSERTED_ERROR", sdkResponse.toJson().toString());
+                SDKResponse sdkResponse = new SDKResponse(methodErr, "Error card" + msg, err);
+                methodChannel.invokeMethod(methodErr, sdkResponse.toJson().toString());
             } else if (result.equalsIgnoreCase("Invalid card")) {
                 SDKResponse sdkResponse = new SDKResponse("INVALID CARD", "Invalid card ", result);
-                methodChannel.invokeMethod("CARD_INSERTED_ERROR", sdkResponse.toJson().toString());
-            } else if (result.equalsIgnoreCase("Scanner cannot be found")) {
-                SDKResponse sdkResponse = new SDKResponse("SCANNER NOT FOUND", "Scanner cannot be found", result);
-                methodChannel.invokeMethod("CARD_INSERTED_ERROR", sdkResponse.toJson().toString());
-            } else if (result.equalsIgnoreCase("Failed to verify FP")) {
-                SDKResponse sdkResponse = new SDKResponse("VERIFY_FP_FAILED", "Failed to verify fingerprint", result);
-                methodChannel.invokeMethod("VERIFY_FP_FAILED", sdkResponse.toJson().toString());
+                methodChannel.invokeMethod(methodErr, sdkResponse.toJson().toString());
             } else {
-                SDKResponse sdkResponse = new SDKResponse("CARD_SUCCESS", "Success data " + cardType, result);
-                methodChannel.invokeMethod("CARD_SUCCESS", sdkResponse.toJson().toString());
+                String method = ReaderStatus.CARD_SUCCESS.name();
+                SDKResponse sdkResponse = new SDKResponse(method, "Success data " + cardType, result);
+                methodChannel.invokeMethod(method, sdkResponse.toJson().toString());
             }
 
         } catch (Exception e) {
-            SDKResponse sdkResponse = new SDKResponse("CARD_INSERTED_ERROR", "Error Data Conversion", "");
-            methodChannel.invokeMethod("CARD_INSERTED_ERROR", sdkResponse);
+            SDKResponse sdkResponse = new SDKResponse(methodErr, "Error Data Conversion", "");
+            methodChannel.invokeMethod(methodErr, sdkResponse);
         }
     }
 

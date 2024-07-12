@@ -1,10 +1,12 @@
 package com.example.mykad_sdk.fpswitch;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.mykad_sdk.AsyncTaskExecutorService;
 import com.example.mykad_sdk.FingerPrintManager;
+import com.example.mykad_sdk.ReaderStatus;
 import com.example.mykad_sdk.SDKResponse;
 import com.securemetric.reader.myid.MyID;
 import com.securemetric.reader.myid.MyIDFP;
@@ -61,20 +63,26 @@ public class ReadFingerprint extends AsyncTaskExecutorService<String, String, St
     protected void onPostExecute(String result) {
         try {
             if (result.equalsIgnoreCase("Failed to verify fingerprint!")) {
+                String method = ReaderStatus.FP_FAILED_VERIFY.name();
                 Toast.makeText(context, "Failed to verify fingerprint!", Toast.LENGTH_SHORT).show();
-                SDKResponse sdkResponse = new SDKResponse("FP_FAILED_VERIFY", "Failed to verify fingerprint!", "");
+                SDKResponse sdkResponse = new SDKResponse(method, "Failed to verify fingerprint!", "");
                 methodChannel.invokeMethod("FP_FAILED_VERIFY", sdkResponse.toJson().toString());
             } else if (result.equalsIgnoreCase("Scanner not found")) {
+                String method = ReaderStatus.FP_SCANNER_ERROR.name();
                 Toast.makeText(context, "Scanner not found", Toast.LENGTH_SHORT).show();
-                SDKResponse sdkResponse = new SDKResponse("FP_SCANNER_ERROR", "Scanner not found", "");
-                methodChannel.invokeMethod("FP_SCANNER_ERROR", sdkResponse.toJson().toString());
+                SDKResponse sdkResponse = new SDKResponse(method, "Scanner not found", "");
+                methodChannel.invokeMethod(method, sdkResponse.toJson().toString());
             } else if (result.equalsIgnoreCase("Success Fingerprint")) {
+                String method = ReaderStatus.FP_SUCCESS_VERIFY.name();
                 Toast.makeText(context, "Success Fingerprint", Toast.LENGTH_SHORT).show();
-                SDKResponse sdkResponse = new SDKResponse("FP_SUCCESS_VERIFY", "Success Fingerprint", "");
-                methodChannel.invokeMethod("FP_SUCCESS_VERIFY", sdkResponse.toJson().toString());
+                SDKResponse sdkResponse = new SDKResponse(method, "Success Fingerprint", "");
+                methodChannel.invokeMethod(method, sdkResponse.toJson().toString());
             }
         } catch (Exception e) {
-
+            String method = ReaderStatus.FP_SCANNER_ERROR.name();
+            Toast.makeText(context, "Scanner not found", Toast.LENGTH_SHORT).show();
+            SDKResponse sdkResponse = new SDKResponse(method, "Scanner error", Log.getStackTraceString(e));
+            methodChannel.invokeMethod(method, sdkResponse.toJson().toString());
         }
     }
 

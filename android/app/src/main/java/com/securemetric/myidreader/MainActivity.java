@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.example.mykad_sdk.AsyncTaskExecutorService;
 import com.example.mykad_sdk.FingerPrintManager;
 import com.example.mykad_sdk.ReadCard;
+import com.example.mykad_sdk.ReaderStatus;
 import com.example.mykad_sdk.SDKResponse;
 import com.example.mykad_sdk.TaskCanceler;
 import com.example.mykad_sdk.fpswitch.DeviceFilterImpl;
@@ -160,9 +161,6 @@ public class MainActivity extends FlutterActivity implements MyIDListener, MyIDP
             Log.d(TAG, msg);
             return;
         }
-//        if (usingFP) {
-//            fpManager.initFPConnector(getApplicationContext());
-//        }
         Log.d(TAG, "Initialize SDK");
         mLocalBCManager = LocalBroadcastManager.getInstance(getApplicationContext());
         mReaderManager = new MyID();
@@ -173,7 +171,6 @@ public class MainActivity extends FlutterActivity implements MyIDListener, MyIDP
         try {
             String license = "eyJ2ZXJzaW9uIjoxLCJwYXlsb2FkIjoiNlVDaG5rVHZoZkt6b1FvZUVoWmIzUnEvaWVqak5ydUM5VmdmZ2VjdVFTejc5TXRtQ1VGS1pHZWJ2OXVmZnQ2MnJ3L1R4eWNVd0d1UTJVMXNwYW13WWxCSGQwVG9yS0I3dHE2UlVaQU5RMGo0d2NuMVhNSXBNaW1kNXc5WGlLWGtjU0FRT3RCdEZJMFdkek1KTm9xZlRKaVVNbjJlU3d0Yy9sUFdHYlY1cHN0UWhGM1l4bWxWZlRPWXQ1MWpZSE5NIiwic2lnbmF0dXJlIjoiTUVVQ0lRQ3R6UmRMc2tWcUdDYTBJVTdYdjBjNDIyRFV2U25rOXVwalk4QVorUi9kRWdJZ1IwSVRWOVVzV29yUTZOMGxOOHp3bTZ6anM2c2lwSXVnejBUL0kxdzdaSms9IiwiY2hhbGxhbmdlX2NvZGUiOiJuRGFsTFhsYzlLIn0=";
             mReaderManager.init(getApplicationContext(), true, license);
-//            mReaderManager.init(getApplicationContext(), true);
         } catch (MyIDException e) {
             Log.d(TAG, "Error on initiate");
             Log.e(TAG, Log.getStackTraceString(e));
@@ -194,11 +191,13 @@ public class MainActivity extends FlutterActivity implements MyIDListener, MyIDP
             mMyIDInfoActivityStartup = null;
         }
         if (status == MyIDReaderStatus.READER_INSERTED) {
-            sdkResponse = new SDKResponse("READER_INSERTED", "Insert SmartCard ...", "");
-            methodChannel.invokeMethod("READER_INSERTED", sdkResponse.toJson());
+            String method = ReaderStatus.READER_INSERTED.name();
+            sdkResponse = new SDKResponse(method, "Insert SmartCard ...", "");
+            methodChannel.invokeMethod(method, sdkResponse.toJson());
         } else if (status == MyIDReaderStatus.CARD_INSERTED) {
-            sdkResponse = new SDKResponse("CARD_INSERTED", "Retrieve data ...", "");
-            methodChannel.invokeMethod("CARD_INSERTED", sdkResponse.toJson());
+            String method = ReaderStatus.CARD_INSERTED.name();
+            sdkResponse = new SDKResponse(method, "Retrieve data ...", "");
+            methodChannel.invokeMethod(method, sdkResponse.toJson());
             runOnUiThread(() -> {
                 pluggedReader = readerName;
                 //CHECK FINGERPRINT SCANNER
@@ -212,11 +211,13 @@ public class MainActivity extends FlutterActivity implements MyIDListener, MyIDP
                 mHandlerTask.postDelayed(mTaskCanceler, 200 * 1000L);
             });
         } else if (status == MyIDReaderStatus.CARD_REMOVE) {
-            sdkResponse = new SDKResponse("CARD_REMOVE", "Insert SmartCard ...", "");
-            methodChannel.invokeMethod("CARD_REMOVE", sdkResponse.toJson());
+            String method = ReaderStatus.CARD_REMOVE.name();
+            sdkResponse = new SDKResponse(method, "Insert SmartCard ...", "");
+            methodChannel.invokeMethod(method, sdkResponse.toJson());
         } else if (status == MyIDReaderStatus.READER_REMOVED) {
-            sdkResponse = new SDKResponse("READER_REMOVED", "Reader Detach", "");
-            methodChannel.invokeMethod("READER_REMOVED", sdkResponse.toJson());
+            String method = ReaderStatus.READER_REMOVED.name();
+            sdkResponse = new SDKResponse(method, "Reader Detach", "");
+            methodChannel.invokeMethod(method, sdkResponse.toJson());
         }
     }
 
@@ -232,10 +233,12 @@ public class MainActivity extends FlutterActivity implements MyIDListener, MyIDP
 
 
     protected void onDispose() {
-        mReaderManager.setOnUsbPermissionListener(null);
-        mReaderManager.setOnReaderStatusChanged(null);
-        mReaderManager.disconnectReader();
-        mReaderManager.destroy();
-        mReaderManager = null;
+        if (mReaderManager != null) {
+            mReaderManager.setOnUsbPermissionListener(null);
+            mReaderManager.setOnReaderStatusChanged(null);
+            mReaderManager.disconnectReader();
+            mReaderManager.destroy();
+            mReaderManager = null;
+        }
     }
 }

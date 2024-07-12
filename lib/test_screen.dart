@@ -15,7 +15,7 @@ class _TestScreenState extends State<TestScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    myKadController.init(verifyFP: false, context: context);
+    myKadController.init(verifyFP: true, context: context);
     WidgetsBinding.instance.addObserver(this);
   }
 
