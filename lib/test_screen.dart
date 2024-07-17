@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mykad_sdk/mykad_sdk/my_kad_widget.dart';
 
+import 'blinking_text.dart';
 import 'mykad_sdk/my_kad_controller.dart';
 
 class TestScreen extends StatefulWidget {
@@ -12,6 +13,7 @@ class TestScreen extends StatefulWidget {
 
 class _TestScreenState extends State<TestScreen> with WidgetsBindingObserver {
   final MyKadController myKadController = MyKadController();
+
   @override
   void initState() {
     super.initState();
@@ -55,20 +57,59 @@ class _TestScreenState extends State<TestScreen> with WidgetsBindingObserver {
               icon: const Icon(Icons.power))
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            MyKadWidget(
-              controller: myKadController,
-              onCardSuccess: (val) {},
-              onVerifyFP: (val) {},
-              builder: (context, msg) {
-                return Text(msg);
-              },
-            )
-          ],
-        ),
-      ),
+      body: LayoutBuilder(builder: (context, constraint) {
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              MyKadWidget(
+                controller: myKadController,
+                onCardSuccess: (val) {},
+                onVerifyFP: (val) {},
+                builder: (context, msg) {
+                  final readerStatus = ReaderStatus.queryStatus(msg);
+
+                  return Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: constraint.maxHeight * .12),
+                        readerStatus.isLoading
+                            ? Padding(
+                                padding: EdgeInsets.only(
+                                    top: constraint.maxHeight * .1),
+                                child: const CircularProgressIndicator(),
+                              )
+                            : FittedBox(
+                                child: Image.asset(
+                                  readerStatus.imgSrc,
+                                  fit: BoxFit.contain,
+                                  height: constraint.maxHeight * .3,
+                                  width: constraint.maxWidth * .8,
+                                ),
+                              ),
+                        SizedBox(height: constraint.maxHeight * .04),
+                        readerStatus.isNotBlink
+                            ? Text(
+                                readerStatus.title,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.w700),
+                              )
+                            : BlinkingText(
+                                readerStatus.title,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.w700),
+                              ),
+                      ],
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+        );
+      }),
     );
   }
 
@@ -99,4 +140,61 @@ class _TestScreenState extends State<TestScreen> with WidgetsBindingObserver {
       ),
     );
   }
+}
+
+enum ReaderStatus {
+  insert(
+      title: "Please insert card",
+      imgSrc: "assets/images/insert_card.png",
+      query: "insert card"),
+  cardSuccess(
+      title: "Read card successful",
+      imgSrc: "assets/images/success_card.png",
+      query: "card successful"),
+  cardFailed(
+      title: "Remove card and try again",
+      imgSrc: "assets/images/failed_card.png",
+      query: "and try again"),
+  remove(
+      title: "Remove card",
+      imgSrc: "assets/images/remove_card.png",
+      query: "remove card"),
+  insertFP(
+      title: "Please place your fingerprint at the scanner",
+      imgSrc: "assets/images/fp_scan.png",
+      query: "place your fingerprint"),
+  successFP(
+      title: "User verification successful",
+      imgSrc: "assets/images/fp_success.png",
+      query: "verification successful"),
+  failedFP(
+      title: "Error: Please try again in 3 second",
+      imgSrc: "assets/images/fp_failed.png",
+      query: "Error: Please"),
+  loading(title: "Loading ...", imgSrc: "", query: "loading"),
+  loadingFP(
+      title: "Verifying Fingerprint...",
+      imgSrc: "",
+      query: "verifying fingerprint"),
+  ;
+
+  final String title;
+  final String imgSrc;
+  final String query;
+
+  bool get isLoading =>
+      this == ReaderStatus.loading || this == ReaderStatus.loadingFP;
+
+  bool get isNotBlink =>
+      this == ReaderStatus.cardSuccess || this == ReaderStatus.successFP;
+
+  static ReaderStatus queryStatus(String query) {
+    final result = ReaderStatus.values
+        .where((stat) => query.toLowerCase().contains(stat.query.toLowerCase()))
+        .toList();
+    return result.isNotEmpty ? result.first : ReaderStatus.loading;
+  }
+
+  const ReaderStatus(
+      {required this.title, required this.imgSrc, required this.query});
 }

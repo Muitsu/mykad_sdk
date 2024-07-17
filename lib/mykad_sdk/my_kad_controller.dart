@@ -35,9 +35,11 @@ class MyKadController {
       MyKadReader.callSDK();
       MyKadReader.sdkListener(
         context: context,
-        onIdle: () {
+        onIdle: () async {
           //Please insert card
           setMessage(msg: "Please insert card");
+          await MyKadReader.disconnectFPScanner();
+          await addDelay();
         },
         onReadCard: () {
           //Loading ...
@@ -50,11 +52,11 @@ class MyKadController {
           setMessage(msg: "Read card successful", data: data);
           if (verifyFP) {
             await MyKadReader.turnOnFP();
+            setMessage(msg: "Please place your fingerprint at the scanner");
             await addDelay(milisec: 3000);
             await MyKadReader.getFPDeviceList();
             await addDelay(milisec: 2000);
             await connectAndScanFP();
-            setMessage(msg: "Please place your fingerprint at the scanner");
           }
         },
         onErrorCard: () {
@@ -70,10 +72,10 @@ class MyKadController {
           setMessage(msg: "User verification successful");
         },
         onErrorFP: () async {
+          setMessage(msg: "Error: Please try again in 3 second");
           //Please try again in 3 second
           await addDelay(milisec: 3000);
           await connectAndScanFP();
-          setMessage(msg: "Error: Please try again in 3 second");
         },
       );
     }
