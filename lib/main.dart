@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:mykad_sdk/doc_scanner.dart';
 import 'package:mykad_sdk/test_screen.dart';
 import 'package:mykad_sdk/test_screen2.dart';
 
@@ -82,6 +83,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             builder: (context) => const TestScreen2()));
                   },
                   child: const Text("Screen 2")),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const DocScanner()));
+                  },
+                  child: const Text("Camera")),
             ],
           ),
         ),
