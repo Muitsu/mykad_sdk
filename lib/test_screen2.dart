@@ -41,12 +41,6 @@ class _TestScreen2State extends State<TestScreen2> with WidgetsBindingObserver {
       onSuccessCard: (data) async {
         //Success read card
         setStatus("Read card successful");
-        await MyKadReader.turnOnFP();
-        await addDelay(milisec: 3000);
-        await MyKadReader.getFPDeviceList();
-        await addDelay(milisec: 2000);
-        await connectAndScanFP();
-        setStatus("Please place your fingerprint at the scanner");
       },
       onErrorCard: () {
         //Remove card and try again
@@ -62,9 +56,7 @@ class _TestScreen2State extends State<TestScreen2> with WidgetsBindingObserver {
       },
       onErrorFP: () async {
         //Please try again in 3 second
-        setStatus("Please try again in 3 second");
-        await addDelay(milisec: 3000);
-        await connectAndScanFP();
+        setStatus("Please try again");
       },
     );
   }
@@ -100,7 +92,7 @@ class _TestScreen2State extends State<TestScreen2> with WidgetsBindingObserver {
               Text(stats),
               ElevatedButton(
                   onPressed: () {
-                    MyKadReader.callSDK();
+                    MyKadReader.callSDK(usingFP: false);
                   },
                   child: const Text("Call SDK")),
               ElevatedButton(

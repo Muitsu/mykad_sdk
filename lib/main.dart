@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         MaterialPageRoute(
                             builder: (context) => const TestScreen()));
                   },
-                  child: const Text("Screen 1")),
+                  child: const Text("Stream SDK Sample")),
               ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         MaterialPageRoute(
                             builder: (context) => const TestScreen2()));
                   },
-                  child: const Text("Screen 2")),
+                  child: const Text("All SDK function")),
               ElevatedButton(
                   onPressed: () {
                     Navigator.push(
