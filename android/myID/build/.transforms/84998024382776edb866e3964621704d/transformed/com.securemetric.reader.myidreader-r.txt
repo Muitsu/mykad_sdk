@@ -1,0 +1,2 @@
+com.securemetric.reader.myidreader
+string app_name
