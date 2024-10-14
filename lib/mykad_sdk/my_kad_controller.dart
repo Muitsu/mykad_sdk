@@ -35,11 +35,9 @@ class MyKadController {
       MyKadReader.callSDK();
       MyKadReader.sdkListener(
         context: context,
-        onIdle: () async {
+        onIdle: () {
           //Please insert card
           setMessage(msg: "Please insert card");
-          await MyKadReader.disconnectFPScanner();
-          await addDelay();
         },
         onReadCard: () {
           //Loading ...
@@ -72,6 +70,7 @@ class MyKadController {
           setMessage(msg: "User verification successful");
         },
         onErrorFP: () async {
+          //Please try again
           setMessage(msg: "Error: Please try again");
         },
       );
